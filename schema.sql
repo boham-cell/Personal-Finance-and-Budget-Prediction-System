@@ -52,3 +52,6 @@ INSERT INTO categories (name, type) VALUES
 ('Food','expense'), ('Transport','expense'),
 ('Airtime & Data','expense'), ('Rent','expense'),
 ('Entertainment','expense'), ('Utilities','expense');
+
+-- USE finance_db;
+-- DELETE FROM transactions;  --use later when implementing real values or updating system 
