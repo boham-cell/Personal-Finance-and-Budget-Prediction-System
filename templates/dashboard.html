@@ -1,20 +1,67 @@
-<h1>Your Financial Dashboard</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Finance Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 0 15px; color: #222; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f3f3f3; }
+    .over { color: #b00020; font-weight: bold; }
+    .note { color: #666; font-size: 0.9em; }
+    img { max-width: 100%; margin: 10px 0; }
+    nav a { margin-right: 15px; }
+  </style>
+</head>
+<body>
+  <nav><a href="/">Dashboard</a> <a href="/add">Add transaction</a></nav>
+  <h1>Your Financial Dashboard</h1>
 
-<h2>Next Month's Estimated Spending</h2>
-<table>
-  <tr><th>Category</th><th>Estimate</th><th>Likely range</th></tr>
-  {% for cat, p in preds.items() %}
-  <tr>
-    <td>{{ cat }}</td>
-    <td>GH₵{{ p.estimate }}</td>
-    <td>GH₵{{ p.low }} to GH₵{{ p.high }}</td>
-  </tr>
+  {% if empty %}
+    <p>No transactions yet. <a href="/add">Add your first one.</a></p>
+  {% else %}
+
+  <h2>Estimated spending for {{ next_month }}</h2>
+  <table>
+    <tr>
+      <th>Category</th><th>Estimate</th><th>Likely range</th>
+      <th>Trend / month</th><th>Budget</th><th>Typical error*</th>
+    </tr>
+    {% for cat, p in preds.items() %}
+    <tr>
+      <td>{{ cat }}</td>
+      <td>GH₵{{ "%.2f"|format(p.estimate) }}</td>
+      <td>GH₵{{ "%.0f"|format(p.low) }} to GH₵{{ "%.0f"|format(p.high) }}</td>
+      <td>{{ "%+.2f"|format(p.trend_per_month) }}</td>
+      <td>
+        {% if budgets.get(cat) %}
+          <span class="{{ 'over' if p.estimate > budgets[cat] else '' }}">
+            GH₵{{ "%.0f"|format(budgets[cat]) }}
+          </span>
+        {% else %}-{% endif %}
+      </td>
+      <td>{% if errors.get(cat) %}±GH₵{{ errors[cat] }}{% else %}-{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p class="note">
+    These figures are estimates based on past spending, not guaranteed amounts.
+    *Typical error is how far off the model was on recent months it had not seen.
+  </p>
+
+  <h2>Suggestions</h2>
+  <ul>
+    {% for t in tips %}<li>{{ t }}</li>{% endfor %}
+  </ul>
+
+  <h2>Charts</h2>
+  <img src="{{ url_for('static', filename='charts/category_pie.png') }}?v={{ ts }}" alt="Category breakdown">
+  <img src="{{ url_for('static', filename='charts/income_vs_expense.png') }}?v={{ ts }}" alt="Income vs expenses">
+  {% for c in trend_charts %}
+    <img src="{{ url_for('static', filename='charts/' ~ c.file) }}?v={{ ts }}" alt="{{ c.category }} trend">
   {% endfor %}
-</table>
-<p><em>These are estimates based on past spending, not guaranteed amounts.</em></p>
 
-<h2>Suggestions</h2>
-<ul>{% for t in tips %}<li>{{ t }}</li>{% endfor %}</ul>
-
-<img src="/static/charts/pie.png">
-<img src="/static/charts/food.png">
+  {% endif %}
+</body>
+</html>
