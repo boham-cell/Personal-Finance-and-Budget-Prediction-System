@@ -35,6 +35,9 @@ def monthly_summary(df):
     pivot["savings"] = pivot.get("income", 0) - pivot.get("expense", 0)
     return pivot
 
+df = clean(load_transactions(1))
+print(monthly_by_category(df))
+print(category_share(df))
 def category_share(df):
     expenses = df[df["type"] == "expense"]
     totals = expenses.groupby("category")["amount"].sum()
