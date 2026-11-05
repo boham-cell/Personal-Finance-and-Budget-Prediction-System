@@ -29,3 +29,6 @@ def predict_next_month(monthly_amounts):
         "high": round(pred + margin, 2),
         "trend_per_month": round(float(model.coef_[0]), 2),
     }
+
+print(predict_next_month([400, 450, 480, 500, 520]))
+# ≈ {'estimate': 553.33, ..., 'trend_per_month': 30.0}
